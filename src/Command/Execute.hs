@@ -28,9 +28,10 @@ help = do
           "r -[name]",
           "  -- Delete an existing rule.",
           "",
-          "add [name] [amount]",
-          "rem [name] [amount]",
-          "mov [name] [name] [amount]",
+          "add [name] [$$]",
+          "add [$$]",
+          "sub [name] [amount]",
+          "mov [name] [name] [$$]",
           "run [$$, opt]",
           "  -- Runs allocations with rules, optionally adding to unallocated count first",
           ""

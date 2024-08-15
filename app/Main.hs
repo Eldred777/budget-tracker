@@ -13,7 +13,6 @@ mainLoop state = do
   putStr "> "
   hFlush stdout
   userInput <- getLine
-  putStrLn ""
   case Parse.command userInput of
     Right command -> do
       newState <- Execute.execute command state
