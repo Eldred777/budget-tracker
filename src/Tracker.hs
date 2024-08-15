@@ -43,5 +43,5 @@ reallocate a1 a2 (State rules fa) =
     Just fa2 -> Right $ State rules fa2
 
 runAllocation :: State -> State
-runAllocation (State r a@(FullAllocation _ u)) =
-  State r $ Allocation.merge a $ Allocation.runRules u r
+runAllocation (State r a) =
+  State r $ Allocation.runAllocation a r

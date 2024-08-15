@@ -24,6 +24,7 @@ help = do
           "r [name] [$$]",
           "r [name] [number]%",
           "  -- Add a new rule, overwriting if a rule with the same name already exists.",
+          "     Supports fixed and percentage allocations from the unallocated pool.",
           "r -[name]",
           "  -- Delete an existing rule.",
           "",
@@ -31,6 +32,7 @@ help = do
           "rem [name] [amount]",
           "mov [name] [name] [amount]",
           "run",
+          "  -- Runs ",
           ""
         ]
   putStrLn $ intercalate "\n" ss

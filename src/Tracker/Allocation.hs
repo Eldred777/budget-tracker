@@ -1,11 +1,10 @@
 module Tracker.Allocation
   ( showAllocation,
-    runRules,
-    merge,
     add,
     sub,
     reallocate,
     addUnallocated,
+    runAllocation,
   )
 where
 
@@ -34,16 +33,15 @@ applyRules total = Map.map (applyRule total)
 computeUnallocated :: Money -> Allocations -> Money
 computeUnallocated total = (total -) . Map.foldl (+) 0
 
--- | Runs rules, producing an allocation
-runRules :: Money -> Rules -> FullAllocation
-runRules total rules = FullAllocation allocated unallocated
+runAllocation :: FullAllocation -> Rules -> FullAllocation
+runAllocation (FullAllocation originalAllocations u) rules =
+  FullAllocation (mergeAllocations originalAllocations newAllocations) unallocated
   where
-    allocated = applyRules total rules
-    unallocated = computeUnallocated total allocated
+    newAllocations = applyRules u rules
+    unallocated = computeUnallocated u newAllocations
 
-merge :: FullAllocation -> FullAllocation -> FullAllocation
-merge (FullAllocation a1 u1) (FullAllocation a2 u2) =
-  FullAllocation (Map.unionWith (+) a1 a2) (u1 + u2)
+mergeAllocations :: Allocations -> Allocations -> Allocations
+mergeAllocations = Map.unionWith (+)
 
 add :: Allocation -> FullAllocation -> FullAllocation
 add (Allocation name d) (FullAllocation allocations unallocated) =
