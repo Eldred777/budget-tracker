@@ -45,6 +45,7 @@ data Command
   | -- | Reallocate requires that the `Allocation`s have the same quantities within them.
     Reallocate Allocation Allocation
   | RunAllocation
+  | RunAllocationWith Money
   | Load FileName
   | Save FileName
 
@@ -60,18 +61,24 @@ command s
   | w == "help" = Right Help
   | w == "clear" = Right ClearAll
   | w == "clr" = Right ClearAll
-  | w == "run" = Right RunAllocation
+  | w == "run" = run args
   | w == "exit" = Right Quit
   | w == "quit" = Right Quit
   | w == "q" = Right Quit
   | w == "load" = load args
   | w == "save" = save args
-  -- TODO: clear rules, clear allocation, add unallocated 
+  -- TODO: clear rules, clear allocation, add unallocated
   | otherwise = Left CommandNotFound
   where
     ws = words s
     w = head ws
     args = tail ws
+
+run :: [String] -> Either ParseError Command
+run [] = Right RunAllocation
+run (x : _) = case parseMoney x of
+  Nothing -> Left NumberFormat
+  Just xx -> Right $ RunAllocationWith xx
 
 -- | Parses user input (prefaced by "r ") into the those `Command`s related to
 -- rules, i.e. NewRule, DeleteRule

@@ -31,8 +31,8 @@ help = do
           "add [name] [amount]",
           "rem [name] [amount]",
           "mov [name] [name] [amount]",
-          "run",
-          "  -- Runs ",
+          "run [$$, opt]",
+          "  -- Runs allocations with rules, optionally adding to unallocated count first",
           ""
         ]
   putStrLn $ intercalate "\n" ss
@@ -61,9 +61,10 @@ execute (Deallocate a) state = case Tracker.deallocate a state of
 execute (Reallocate a1 a2) state = case Tracker.reallocate a1 a2 state of
   Left Tracker.KeyDNE -> undefined -- TODO proper implementation
   Right s -> purer s
-execute RunAllocation state = purer $ Tracker.runAllocation state
-execute (AddUnallocated m) state = purer $ Tracker.addUnallocated m state
-
+execute (RunAllocationWith x) state = do -- TODO 
+  purer $ Tracker.runAllocation $ Tracker.addUnallocated x state
+execute RunAllocation state = purer $ Tracker.runAllocation state -- TODO 
+execute (AddUnallocated m) state = purer $ Tracker.addUnallocated m state -- TODO 
 -- IO
 execute (Load path) _____ = do
   s <- IO.load path
@@ -71,3 +72,6 @@ execute (Load path) _____ = do
 execute (Save path) state = do
   IO.save path state
   purer state
+
+printState :: State -> IO ()
+printState = putStrLn . showState
