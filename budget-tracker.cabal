@@ -1,0 +1,70 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           budget-tracker
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Eldred777/budget-tracker#readme>
+homepage:       https://github.com/Eldred777/budget-tracker#readme
+bug-reports:    https://github.com/Eldred777/budget-tracker/issues
+author:         Ciaran KG
+maintainer:     55831661+Eldred777@users.noreply.github.com
+copyright:      2024 Ciaran KG
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/Eldred777/budget-tracker
+
+library
+  exposed-modules:
+      Command.Execute
+      Command.Parse
+      Tracker
+      Tracker.Allocation
+      Tracker.IO
+      Tracker.Rules
+      Tracker.State
+      Types
+  other-modules:
+      Paths_budget_tracker
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , containers ==0.6.7
+    , split ==0.2.3.5
+  default-language: Haskell2010
+
+executable budget-tracker-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_budget_tracker
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , budget-tracker
+  default-language: Haskell2010
+
+test-suite budget-tracker-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_budget_tracker
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , budget-tracker
+  default-language: Haskell2010
