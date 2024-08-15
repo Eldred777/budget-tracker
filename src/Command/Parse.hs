@@ -97,7 +97,7 @@ delRule x = Right $ DeleteRule x
 parseRuleType :: String -> Either ParseError RuleType
 parseRuleType s =
   if last s == '%'
-    then ruleTypeProp s
+    then ruleTypeProp $ init s
     else ruleTypeFixed s
 
 ruleTypeFixed, ruleTypeProp :: String -> Either ParseError RuleType

@@ -9,17 +9,16 @@ import System.IO (hFlush, stdout)
 
 mainLoop :: State -> IO ()
 mainLoop state = do
-  putStrLn $ showState state
-  putStrLn ""
-  putStrLn "What do you want me to do? (empty to quit)"
   putStr "> "
   hFlush stdout
-  s <- getLine
+  userInput <- getLine
   putStrLn ""
-  case Parse.command s of
+  case Parse.command userInput of
     Right command -> do
       newState <- Execute.execute command state
-      -- \/ execute only if newState is not Nothing
+      case newState of 
+        Just s -> putStrLn $ showState s 
+        Nothing -> return ()  
       forM_ newState mainLoop
     Left parseErr -> do
       Parse.displayErr parseErr
