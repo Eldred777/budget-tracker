@@ -5,7 +5,7 @@ import Command.Parse (Command (..))
 import Data.List (intercalate)
 import qualified Tracker
 import qualified Tracker.IO as IO
-import Tracker.State (State, blankState)
+import Tracker.State (State, blankState, showState)
 
 help :: IO ()
 help = do
@@ -42,7 +42,7 @@ purer = pure . pure
 
 execute :: Command -> State -> IO (Maybe State)
 execute Quit _ = return Nothing
-execute ClearAll _ = purer blankState
+execute ClearAll _ = printStateAndReturn blankState
 execute ClearRules _ = undefined -- TODO implement execute ClearRules
 execute ClearAllocation _ = undefined -- TODO implement execute ClearAllocation
 execute Help state = do
@@ -50,27 +50,40 @@ execute Help state = do
   purer state
 
 -- add/delete rules/allocations
-execute (NewRule rule) state = purer $ Tracker.newRule rule state
-execute (DeleteRule rn) state = purer $ Tracker.deleteRule rn state
-execute (Allocate a) state = purer $ Tracker.allocate a state
-execute (Deallocate a) state = case Tracker.deallocate a state of
-  Left Tracker.KeyDNE -> do
-    print "Failed to find key."
-    purer state
-  Right newState -> purer newState
-execute (Reallocate a1 a2) state = case Tracker.reallocate a1 a2 state of
-  Left Tracker.KeyDNE -> undefined -- TODO proper implementation
-  Right s -> purer s
-execute (RunAllocationWith x) state = do -- TODO 
-  purer $ Tracker.runAllocation $ Tracker.addUnallocated x state
-execute RunAllocation state = purer $ Tracker.runAllocation state -- TODO 
-execute (AddUnallocated m) state = purer $ Tracker.addUnallocated m state -- TODO 
+execute (NewRule rule) state =
+  printStateAndReturn $ Tracker.newRule rule state
+execute (DeleteRule rn) state =
+  printStateAndReturn $ Tracker.deleteRule rn state
+execute (Allocate a) state =
+  printStateAndReturn $ Tracker.allocate a state
+execute (Deallocate a) state =
+  case Tracker.deallocate a state of
+    Left Tracker.KeyDNE -> do
+      print "Failed to find key."
+      purer state
+    Right newState -> do
+      printStateAndReturn newState
+execute (Reallocate a1 a2) state =
+  case Tracker.reallocate a1 a2 state of
+    Left Tracker.KeyDNE -> do
+      print "Failed to find key."
+      purer state
+    Right s -> printStateAndReturn s
+execute (RunAllocationWith x) state =
+  printStateAndReturn $ Tracker.runAllocation $ Tracker.addUnallocated x state
+execute RunAllocation state = printStateAndReturn $ Tracker.runAllocation state
+execute (AddUnallocated m) state = printStateAndReturn $ Tracker.addUnallocated m state
 -- IO
 execute (Load path) _____ = do
   s <- IO.load path
-  purer s
+  printStateAndReturn s
 execute (Save path) state = do
   IO.save path state
+  purer state
+
+printStateAndReturn :: State -> IO (Maybe State)
+printStateAndReturn state = do
+  printState state
   purer state
 
 printState :: State -> IO ()
