@@ -133,11 +133,11 @@ Left NumberFormat
 allocate, deallocate, reallocate :: [String] -> Either ParseError Command
 allocate [] = Left $ InsufficientArguments 1
 -- Add unallocated amount
-allocate [x] = case parseMoney x of 
+allocate [x] = case parseMoney x of
   Nothing -> Left NumberFormat
-  Just xx -> Right $ AddUnallocated xx 
--- Add to an allocation 
-allocate (x:y:_) = case parseMoney y of
+  Just xx -> Right $ AddUnallocated xx
+-- Add to an allocation
+allocate (x : y : _) = case parseMoney y of
   Nothing -> Left NumberFormat
   Just yy -> Right $ Allocate (Allocation x yy)
 deallocate [] = Left $ InsufficientArguments 2
