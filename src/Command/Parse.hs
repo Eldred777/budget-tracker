@@ -5,7 +5,6 @@ module Command.Parse
   )
 where
 
-import Data.List.Split (startsWith)
 import GHC.Float (float2Int)
 import Text.Read (readMaybe)
 import Types
