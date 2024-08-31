@@ -11,7 +11,7 @@ import qualified System.IO as IO
 import Tracker.State
 import Types
 
-type Filename = String -- ?
+type Filename = String
 
 pathify :: String -> String
 pathify filename = "./db/" ++ filename ++ ".db"
@@ -21,7 +21,7 @@ save filename (State rules allocation) = do
   let path = pathify filename
   -- overwrite file
   writeFile path $ saveRules rules
-  appendFile path "\n"
+  appendFile path "\n\n"
   appendFile path $ saveAllocation allocation
 
 -- | Transform rules into a save-able format
@@ -46,18 +46,20 @@ load filename = do
   let path = pathify filename
   s <- IO.readFile path
   let ss = splitOn [""] $ lines s
-  let rules = head ss
-  -- TODO verify this exists
-  let allocation_s = head $ tail ss
-  let allocations_s = drop 1 allocation_s
-  let unallocated_s = head allocation_s
-  let state = Map.fromList $ map parseRule rules
-  let allocation = Map.fromList $ map parseAllocation allocations_s
-  let unallocated = read unallocated_s :: Money
-  return $ State state (FullAllocation allocation unallocated)
+  let rulesStr = head ss
 
-parseRule :: String -> (RuleName, RuleType)
-parseRule s = (name, rt)
+  -- TODO verify this exists
+  let allocationStr = head $ tail ss
+  let allocationsStr = drop 1 allocationStr
+  let unallocatedStr = head allocationStr
+
+  let rules = Map.fromList $ map loadRule rulesStr
+  let allocation = Map.fromList $ map loadAllocation allocationsStr
+  let unallocated = read unallocatedStr :: Money
+  return $ State rules (FullAllocation allocation unallocated)
+
+loadRule :: String -> (RuleName, RuleType)
+loadRule s = (name, rt)
   where
     ws = words s
     name = head ws
@@ -68,9 +70,23 @@ parseRule s = (name, rt)
       | qualifier == "prop" = Proportion (read amount)
       | otherwise = error "bad argument to Tracker.IO.parseRule"
 
-parseAllocation :: String -> (RuleName, Money)
-parseAllocation s = (name, money)
+loadAllocation :: String -> (RuleName, Money)
+loadAllocation s = (name, money)
   where
     ws = words s
     name = head ws
     money = read $ ws !! 1
+
+{-
+>>> s <- IO.readFile "./db/default.db"
+>>> s
+>>> let sl = lines s
+>>> sl
+>>> let sls = splitOn [""] sl
+>>> sls
+>>> head sls
+"daily prop 0.2\nfun prop 5.0e-2\ngames prop 5.0e-2\nsavings prop 0.5\nshort-term-savings prop 0.2\n\n0\ndaily 39200\nfun 9800\ngames 9800\nsavings 98000\nshort-term-savings 39200"
+["daily prop 0.2","fun prop 5.0e-2","games prop 5.0e-2","savings prop 0.5","short-term-savings prop 0.2","","0","daily 39200","fun 9800","games 9800","savings 98000","short-term-savings 39200"]
+[["daily prop 0.2","fun prop 5.0e-2","games prop 5.0e-2","savings prop 0.5","short-term-savings prop 0.2"],["0","daily 39200","fun 9800","games 9800","savings 98000","short-term-savings 39200"]]
+["daily prop 0.2","fun prop 5.0e-2","games prop 5.0e-2","savings prop 0.5","short-term-savings prop 0.2"]
+-}
