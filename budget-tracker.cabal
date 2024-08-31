@@ -4,17 +4,17 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 
-name:           budget-tracker
-version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/Eldred777/budget-tracker#readme>
-homepage:       https://github.com/Eldred777/budget-tracker#readme
-bug-reports:    https://github.com/Eldred777/budget-tracker/issues
-author:         Ciaran KG
-maintainer:     55831661+Eldred777@users.noreply.github.com
-copyright:      2024 Ciaran KG
-license:        MIT
-license-file:   LICENSE
-build-type:     Simple
+name:               budget-tracker
+version:            0.1.0.0
+description:        Please see the README on GitHub at <https://github.com/Eldred777/budget-tracker#readme>
+homepage:           https://github.com/Eldred777/budget-tracker#readme
+bug-reports:        https://github.com/Eldred777/budget-tracker/issues
+author:             Ciaran KG
+maintainer:         55831661+Eldred777@users.noreply.github.com
+copyright:          2024 Ciaran KG
+license:            MIT
+license-file:       LICENSE
+build-type:         Simple
 extra-source-files:
     README.md
     CHANGELOG.md
