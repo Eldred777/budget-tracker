@@ -6,6 +6,7 @@ import Data.List (intercalate)
 import qualified Tracker
 import qualified Tracker.IO as IO
 import Tracker.State (State, blankState, showState)
+import qualified Tracker.State as State
 
 help :: IO ()
 help = do
@@ -44,8 +45,8 @@ purer = pure . pure
 execute :: Command -> State -> IO (Maybe State)
 execute Quit _ = return Nothing
 execute ClearAll _ = printStateAndReturn blankState
-execute ClearRules _ = undefined -- TODO implement execute ClearRules
-execute ClearAllocation _ = undefined -- TODO implement execute ClearAllocation
+execute ClearRules state = purer $ State.clearRules state
+execute ClearAllocation state = purer $ State.clearAllocations state
 execute Help state = do
   help
   purer state

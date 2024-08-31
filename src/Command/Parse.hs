@@ -5,6 +5,7 @@ module Command.Parse
   )
 where
 
+import Data.List.Split (startsWith)
 import GHC.Float (float2Int)
 import Text.Read (readMaybe)
 import Types
@@ -59,8 +60,8 @@ command s
   | w == "sub" = deallocate args
   | w == "mov" = reallocate args
   | w == "help" = Right Help
-  | w == "clear" = Right ClearAll
-  | w == "clr" = Right ClearAll
+  | w == "clear" = clear args
+  | w == "clr" = clear args
   | w == "run" = run args
   | w == "exit" = Right Quit
   | w == "quit" = Right Quit
@@ -175,3 +176,12 @@ save [] = Right $ Save defaultFile
 save (path : _) = Right $ Save path
 load [] = Right $ Load defaultFile
 load (path : _) = Right $ Load path
+
+clear :: [String] -> Either ParseError Command
+clear [] = Right ClearAll
+clear (x : _)
+  | x == "rules" = Right ClearRules
+  | x == "r" = Right ClearRules
+  | x == "allocation" = Right ClearAllocation
+  | x == "a" = Right ClearAllocation
+  | otherwise = Left InvalidArgument

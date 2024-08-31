@@ -5,6 +5,7 @@ module Tracker.Allocation
     reallocate,
     addUnallocated,
     runAllocation,
+    emptyAllocation
   )
 where
 
@@ -73,3 +74,6 @@ showAllocation (FullAllocation rulesAllocations unallocated) =
   where
     -- TODO: padding to longest length of name
     inner acc key val = acc ++ key ++ " -- " ++ showMoney val ++ "\n"
+
+emptyAllocation :: FullAllocation
+emptyAllocation = FullAllocation Map.empty 0 
