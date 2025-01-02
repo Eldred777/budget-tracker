@@ -1,6 +1,7 @@
 -- | This module contains the internal logic for the budget tracker.
 module Tracker
   ( newRule,
+    newRules,
     deleteRule,
     allocate,
     deallocate,
@@ -18,6 +19,11 @@ import Types
 
 newRule :: Rule -> State -> State
 newRule r (State rr a) = State (Rules.insert r rr) a
+
+newRules :: [Rule] -> State -> State
+newRules [] state = state
+newRules [r] state = newRule r state
+newRules (r : rs) state = newRules rs (newRule r state)
 
 deleteRule :: RuleName -> State -> State
 deleteRule rn (State r a) = State (Rules.delete rn r) a

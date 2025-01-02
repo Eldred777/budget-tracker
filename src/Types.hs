@@ -55,6 +55,14 @@ data FullAllocation = FullAllocation Allocations Money deriving (Show, Eq)
 -- by Command.Parse
 data Rule = Rule {ruleName :: RuleName, ruleType :: RuleType}
 
+instance Show Rule where
+  show rule = "Rule " ++ ruleName rule ++ " " ++ show (ruleType rule)
+
+{-
+>>> show $ Rule "a" (Fixed 1)
+"Rule \"a\" $0.01"
+-}
+
 -- | Intermediate representation of a rule allocation. This should only ever be
 -- constructed by Command.Parse
 data Allocation = Allocation RuleName Money deriving (Show, Eq)

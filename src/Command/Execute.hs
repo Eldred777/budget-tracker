@@ -22,19 +22,26 @@ help = do
           -- "clear rules : Resets state of ",
           -- "clear allocations : Resets state of ",
           "",
-          "r [name] [$$]",
-          "r [name] [number]%",
+          "r [name] [num]",
+          "r [name] [num]%",
+          "r [(name + $/%) ...]",
           "  -- Add a new rule, overwriting if a rule with the same name already exists.",
           "     Supports fixed and percentage allocations from the unallocated pool.",
           "r -[name]",
           "  -- Delete an existing rule.",
           "",
-          "add [name] [$$]",
-          "add [$$]",
+          "add [name] [$]",
+          "  -- Adds [$] amount to the allocation [name].",
+          "add [$]",
+          "  -- Adds [$] amount to the unallocated fund.",
           "sub [name] [amount]",
-          "mov [name] [name] [$$]",
-          "run [$$, opt]",
-          "  -- Runs allocations with rules, optionally adding to unallocated count first",
+          "  -- Subtracts [$]  to the unallocated fund.",
+          "mov [name1] [name2] [$]",
+          "  -- Moves [$] from [name1] allocation to [name2] allocation.",
+          "",
+          "run",
+          "run [$]",
+          "  -- Runs allocations with rules, optionally adding [$] to unallocated fund first",
           ""
         ]
   putStrLn $ intercalate "\n" ss
@@ -54,6 +61,8 @@ execute Help state = do
 -- add/delete rules/allocations
 execute (NewRule rule) state =
   printStateAndReturn $ Tracker.newRule rule state
+execute (NewRules rules) state =
+  printStateAndReturn $ Tracker.newRules rules state
 execute (DeleteRule rn) state =
   printStateAndReturn $ Tracker.deleteRule rn state
 execute (Allocate a) state =

@@ -16,6 +16,7 @@ data ParseError
   | InvalidArgument
   | EmptyArgument
   | InsufficientArguments ExpectedArgCount
+  | ReqEvenArgs
   | NumberFormat
   | Other String
   deriving (Show, Eq)
@@ -26,6 +27,7 @@ displayErr InvalidArgument = putStrLn "Invalid argument."
 displayErr EmptyArgument = putStrLn "No arguments supplied."
 displayErr (InsufficientArguments expected) =
   putStrLn $ "Not enough arguments supplied, expected " ++ show expected
+displayErr ReqEvenArgs = putStrLn "Expected even number of arguments."
 displayErr NumberFormat = putStrLn "Could not parse number."
 displayErr (Other s) = putStrLn $ "Parsing error: " ++ s
 
@@ -38,6 +40,7 @@ data Command
   | ClearRules
   | ClearAllocation
   | NewRule Rule
+  | NewRules [Rule]
   | DeleteRule RuleName
   | AddUnallocated Money
   | Allocate Allocation
@@ -48,6 +51,24 @@ data Command
   | RunAllocationWith Money
   | Load FileName
   | Save FileName
+
+instance Show Command where
+  show Help = "Help"
+  show Quit = "Quit"
+  show ClearAll = "Clear All"
+  show ClearRules = "Clear Rules"
+  show ClearAllocation = "Clear Allocation"
+  show (NewRule rule) = "NewRule " ++ show rule
+  show (NewRules rules) = "NewRules " ++ show rules
+  show (DeleteRule name) = "DeleteRule " ++ name
+  show (AddUnallocated money) = "AddUnallocated " ++ show money
+  show (Allocate allocation) = "Allocate " ++ show allocation
+  show (Deallocate allocation) = "Allocate " ++ show allocation
+  show (Reallocate allocation1 allocation2) = "Reallocate " ++ show allocation1 ++ " " ++ show allocation2
+  show RunAllocation = "RunAllocation"
+  show (RunAllocationWith money) = "RunAllocationWith " ++ show money
+  show (Load fileName) = "Load " ++ show fileName
+  show (Save fileName) = "Save " ++ show fileName
 
 -- | Parses user input into `Command`s.
 -- Should be surjective!
@@ -62,9 +83,11 @@ command s
   | w == "clear" = clear args
   | w == "clr" = clear args
   | w == "run" = run args
+  --
   | w == "exit" = Right Quit
   | w == "quit" = Right Quit
   | w == "q" = Right Quit
+  --
   | w == "load" = load args
   | w == "save" = save args
   -- TODO: clear rules, clear allocation, add unallocated
@@ -86,6 +109,7 @@ ruleCmd :: [String] -> Either ParseError Command
 ruleCmd [] = Left CommandNotFound -- TODO: better error signalling
 ruleCmd ws
   | head w == '-' = delRule $ tail w
+  | length ws > 2 = newRules ws
   | otherwise = newRule ws
   where
     w = head ws
@@ -94,8 +118,31 @@ newRule :: [String] -> Either ParseError Command
 newRule [] = Left $ InsufficientArguments 2
 newRule [_] = Left $ InsufficientArguments 2
 newRule (x : y : _) = case parseRuleType y of
-  (Left e) -> Left e
+  Left e -> Left e
   Right m -> Right $ NewRule (Rule x m)
+
+newRules :: [String] -> Either ParseError Command
+newRules [] = Left $ InsufficientArguments 2
+newRules [_] = Left $ InsufficientArguments 2
+newRules xs = case inner xs of
+  Left e -> Left e
+  Right m -> Right $ NewRules m
+  where
+    inner :: [String] -> Either ParseError [Rule]
+    inner [] = Right []
+    inner [_] = Left $ InsufficientArguments 2
+    inner (x : y : zs) =
+      case parseRuleType y of
+        Left e -> Left e
+        Right m -> case inner zs of
+          Left e -> Left e
+          Right n -> Right (Rule x m : n)
+
+{-
+>>> newRules $ words "a 5% b 5"
+No instance for (Show Command) arising from a use of `evalPrint'
+In a stmt of an interactive GHCi command: evalPrint it_a2N90
+-}
 
 delRule :: String -> Either ParseError Command
 delRule [] = Left $ InsufficientArguments 1
@@ -121,10 +168,10 @@ ruleTypeProp s = case readMaybe s of
 >>> ruleTypeProp "1"
 >>> ruleTypeProp "1.2"
 >>> ruleTypeProp "a"
-Right (Fixed 1)
-Left NumberFormat
-Right (Proportion 1.0)
-Right (Proportion 1.2)
+Right $1.00
+Right $1.20
+Right 1.00%
+Right 1.20%
 Left NumberFormat
 -}
 
